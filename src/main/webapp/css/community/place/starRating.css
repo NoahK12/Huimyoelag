@@ -1,0 +1,108 @@
+.review {
+  width: 400px;
+  background: #111;
+  padding: 20px 30px;
+  border: 1px solid #444;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: 20px auto;
+}
+.review .reviewTitle {
+	color: white;
+    font-size: 24px;
+    mragin-bottom: 20px;
+    display: block;
+    margin-bottom: 10px;
+}
+.review .starWidget .rate {
+  display: none;
+}
+.review .starWidget label {
+  font-size: 40px;
+  color: #444;
+  padding: 10px;
+  float: right;
+  transition: all 0.2s ease;
+}
+.review .rate:not(:checked) ~ label:hover,
+.review .rate:not(:checked) ~ label:hover ~ label {
+  color: #fd4;
+}
+.review .rate:checked ~ label {
+  color: #fd4;
+}
+.review .rate#rate-5:checked ~ label {
+  color: #fe7;
+  text-shadow: 0 0 20px #952;
+}
+.review #rate-1:checked ~ .reviewForm header:before {
+  content: "정말 별로에요 😫";
+}
+.review #rate-2:checked ~ .reviewForm header:before {
+  content: "별로에요 😣";
+}
+.review #rate-3:checked ~ .reviewForm header:before {
+  content: "괜찮아요 😄";
+}
+.review #rate-4:checked ~ .reviewForm header:before {
+  content: "좋아요 😎";
+}
+.review #rate-5:checked ~ .reviewForm header:before {
+  content: "정말 좋아요 😍";
+}
+.review .reviewForm {
+  display: none;
+}
+.review .rate:checked ~ .reviewForm {
+  display: block;
+}
+.review .reviewForm header {
+  width: 100%;
+  font-size: 25px;
+  color: #fe7;
+  font-weight: 500;
+  margin: 5px 0 20px 0;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+.review .reviewForm .textarea {
+  height: 100px;
+  width: 100%;
+  overflow: hidden;
+}
+.review .reviewForm .textarea textarea {
+  height: 100%;
+  width: 100%;
+  outline: none;
+  color: #eee;
+  border: 1px solid #333;
+  background: #222;
+  padding: 10px;
+  font-size: 17px;
+  resize: none;
+}
+.review .reviewForm .btn {
+  height: 45px;
+  width: 100%;
+  margin: 15px 0;
+  display: flex;
+}
+.review .reviewForm .btn button {
+  height: 100%;
+  width: 100%;
+  border: 1px solid #444;
+  outline: none;
+  background: #222;
+  color: #999;
+  font-size: 17px;
+  font-weight: 500;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.review .reviewForm .btn button:hover {
+  background: #1b1b1b;
+}

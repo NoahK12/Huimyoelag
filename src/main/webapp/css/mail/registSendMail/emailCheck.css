@@ -1,0 +1,13 @@
+@charset "UTF-8";
+
+#wrap{
+		
+	width: 380px;
+	height: 480px;
+	margin: auto;
+}
+	
+.MailCheckField{
+	margin:auto;
+	width: 70%;
+}

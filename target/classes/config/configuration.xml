@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<mappers>
+		<mapper resource="config/mapper/placeMapper.xml"/>
+		<mapper resource="config/mapper/authMapper.xml"/>
+		<mapper resource="config/mapper/webMediaMapper.xml"/>
+		<mapper resource="config/mapper/mailMapper.xml"/>
+		<mapper resource="config/mapper/shopMapper.xml"/>
+		<mapper resource="config/mapper/postCatMapper.xml"/>
+		<mapper resource="config/mapper/profileMapper.xml"/>
+		<mapper resource="config/mapper/communityMainMapper.xml"/>
+		<mapper resource="config/mapper/schedulerMapper.xml"/>
+		<mapper resource="config/mapper/mypageMapper.xml"/>
+		<mapper resource="config/mapper/mainMapper.xml"/>
+		<mapper resource="config/mapper/postMapper.xml"/>
+	</mappers>
+</configuration>

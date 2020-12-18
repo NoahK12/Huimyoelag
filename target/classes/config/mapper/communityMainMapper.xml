@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="community">
+
+	<resultMap type="dto.PostDTO" id="community">
+			<result column="title" property="title"/>
+		
+		<association property="comcNick" javaType="dto.CatUserDTO">
+			<result column="nickname" property="nickname"/>
+		</association> 
+	</resultMap>
+	<select id="list" parameterType="dto.PostDTO" resultMap="community">
+		select * 
+		from(select row_number() over(order by view_count desc) post_id_seq
+		, p.title
+		, u.nickname
+		from post p, cat_user u
+		where p.cat_user_id = u.id
+		)
+		where post_id_seq
+   <![CDATA[ < ]]> 6
+   </select>
+   
+	<!-- <select id="image_list" parameterType="dto.PostCatDTO"
+		resultType="dto.PostCatDTO">
+		select content
+		from(select row_number() over(order by view_count desc) post_cat_id_seq
+		,content
+		from post_cat
+		)
+		where post_cat_id_seq
+   <![CDATA[ < ]]> 5
+	</select> -->
+	
+		<resultMap type="dto.PostCatDTO" id="post_cat_list" autoMapping="false">
+		<result column="pc_id" property="id"/>
+		<result column="pc_view_count" property="viewCount"/>
+		<result column="pc_updatedat" property="updatedAt"/>
+		
+		<association property="catUser" javaType="dto.CatUserDTO" >
+			<result column="u_nickname" property="nickname"/>
+			<result column="u_image" property="image"/>
+		</association>
+		
+		<association property="likeCounting" javaType="dto.PostCatLikeDTO" >
+			<result column="pcl_like_count" property="likeCount"/>
+		</association>
+		
+		<collection property="mediaList" autoMapping="false" javaType="java.util.List" ofType="dto.PostCatMediaDTO">
+			<result column="url" property="url"/>
+		</collection>
+		
+	</resultMap>
+
+	<select id="image_list" resultMap="post_cat_list">
+		SELECT u.nickname as u_nickname, u.image as u_image,
+		       pc.id as pc_id, pc.view_count as pc_view_count, pc.updatedat as pc_updatedat,
+		       pcm.url,
+		       pcl.pcl_like_count 
+		FROM cat_user u, post_cat pc, post_cat_media pcm,
+		     (SELECT count(*) as pcl_like_count, post_cat_id FROM post_cat_like group by post_cat_id) pcl
+		WHERE u.id = pc.cat_user_id 
+		      and pc.id=pcm.post_cat_id 
+		      and pc.id = pcl.post_cat_id(+)
+		ORDER BY pc_updatedat DESC
+	</select>
+
+</mapper>

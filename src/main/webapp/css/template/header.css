@@ -1,0 +1,159 @@
+@charset "UTF-8";
+
+.header {
+	width: 100%;
+	height: 70px;
+}
+
+.mainheader {
+	height: 100%;
+	border-bottom: 1px solid rgba(30, 38, 44, 0.05);
+}
+
+/* mainheader -> */
+.logo-box {
+	width: 140px;
+	display: flex;
+	justify-content: center;
+	margin: 0 auto;
+}
+
+#logo-contain{
+	width: 100%;
+	height: 100%
+}
+
+#logo{
+	width: 100%;
+	height: 100%
+}
+
+
+.btn-box {
+	position: absolute;
+	right: 0;
+	top: 0;
+	height: 100%;
+	padding-top: 20px;
+	display: flex;
+}
+
+.btn-box button {
+	outline: 0 !important;
+	width: 60px;
+	height: 30px;
+	margin-right: 15px;
+	background-color: #ffffff;
+	border: none;
+	cursor: pointer;
+	
+}
+
+#dropdownMenuButton{
+	outline: 0 !important;
+	border-radius: 99px;
+	padding: 0 11px;
+	height: 32px;
+	line-height: 30px;
+	font-size: 12px;
+	background-color: white;
+	border: 1px solid #1e262c;
+	color: #1e262c;
+	cursor: pointer;
+}
+
+
+.btn-box a img {
+	vertical-align: middle;
+}
+
+#main-home-img, #community-home-img, #shop-home-img, #login-img, #regist-img{
+	height: 100%;
+	width: 100%; 
+}
+
+/* mainheader <- */
+.navheader {
+	z-index: 1000;
+	height: 50px;
+	margin: 0 auto;
+	position: sticky;
+	top: 0;
+	background-color: white;
+	border-bottom: 1px solid rgba(30, 38, 44, 0.05);
+}
+
+/* scroll shadow -> */
+.shadow {
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+/* scroll shadow <- */
+.headerInner {
+	width: 1080px;
+	height: 100%;
+	margin: 0 auto;
+	position: relative;
+	display: flex;
+}
+
+/* gnbbar -> */
+.gnb-bar {
+	/* float: left; */
+}
+
+.gnbBtn {
+	display: block;
+}
+
+.gnb-title {
+	float: left;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 50px;
+}
+
+a:hover {
+    text-decoration: none !important;
+}
+
+.gnb-title a {
+	border: none;
+	font-size: 15px;
+	font-weight: 700;
+	color: black;
+	font: bold;
+}
+
+.gnb-title img {
+	margin-left: 15px;
+	width: 7px;
+	border: none;
+	outline: none;
+}
+
+.gnb-list {
+	float: left;
+	height: 100%;
+	align-items: center;
+	margin-bottom: 0px;	
+	display: flex;
+}
+
+.gnb-list li {
+	float: left;
+	margin-left: 30px;
+	font-size: 15px;
+	font-weight: 300;
+}
+
+.gnb-list li a {
+	color: rgba(30, 38, 44, 0.5);
+}
+.gnb-list li a:hover{
+	text-decoration: underline !important;
+}
+.dropdown-menu.show{
+	z-index: 1500;
+}
+/* gnbbar <- */

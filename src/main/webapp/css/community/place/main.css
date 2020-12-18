@@ -1,0 +1,85 @@
+/* Row */
+.container .row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+/* Filter */
+.filterContainer {
+	
+}
+.filterContainer .selectBox {
+	width: 150px;
+	padding: 10px;
+	border: 1px solid #999;
+	font-family: inherit;
+	border-radius: 5px;
+}
+/* Card */
+.card {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	grid-column-gap: 15px;
+}
+
+.cardContainer {
+	width: 100%;
+	overflow: hidden;
+	border-radius: 5px;
+	box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.23);
+	margin: 0px 20px 20px 0px;
+	position: relative;
+}
+
+.cardContainer .imageContainer {
+	width: 100%;
+}
+
+.cardContainer .imageContainer img {
+	height: 250px;
+}
+
+.cardContainer .contentContainer {
+	padding: 10px;
+}
+
+.cardContainer .contentContainer .tag {
+	background-color: #2d9cdb;
+	color: white;
+	font-size: 16px;
+	border-radius: 5px;
+	font-weight: 600;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 10px;
+	display: inline-block;
+	padding: 5px 10px;
+}
+
+.cardContainer .contentContainer .title {
+	font-size: 16px;
+	font-weight: 600;
+	margin-bottom: 5px;
+}
+
+.cardContainer .contentContainer .placeName {
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.cardContainer .detailLink {
+	font-size: 14px;
+	color: #03A9F4;
+	display: flex;
+	justify-content: flex-end;
+	margin-right: 5px;
+	margin-bottom: 5px;
+	transition: all 0.3s ease;
+}
+
+.cardContainer .detailLink:hover {
+	color: #2196F3;
+}

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="myPage">
+	
+	<insert id="insert_mycat" parameterType="dto.CatDTO">
+		insert into cat
+		values(cat_id_seq.nextval, #{catUserId}, #{catCodeId},#{name},#{age},#{weight},#{status},#{legLength},#{circumference},#{recCalory},#{image},#{gender},#{mainCat},#{birthday},sysdate,sysdate)
+	</insert>
+	
+	
+	<select id="select_mycat" parameterType="int" resultMap="list_view">
+		select m.id, m.cat_user_id, c.kind, m.name, m.age,m.weight,m.status,m.leg_length,m.circumference,m.rec_calory,m.image,m.gender,m.main_cat,m.birthday,m.createdAt,m.updatedAt
+		from cat m, cat_code c
+		where m.cat_user_id = c.id
+		and m.cat_user_id = #{userId}
+	</select>
+	
+	
+	<!-- 처음 마이페이지들어왔을때 내 고양이 리스트 -->
+	<select id="first_select_cat" parameterType="int" resultMap="list_view">
+		select m.id as myCatSeq, c.id as catCodeSeq, m.*, c.*
+		from cat m, cat_code c
+		where m.cat_user_id = c.id
+		and m.cat_user_id = #{firstuserId}
+	</select>
+	
+	<!-- 매핑 -->
+	<resultMap type="dto.CatDTO" id="list_view">
+		
+		<result column="myCatSeq" property="id"/>
+		<result column="cat_user_id" property="catUserId"/>
+		<result column="cat_code_id" property="catCodeId"/>
+		<result column="name" property="name"/>
+		<result column="age" property="age"/>
+		<result column="weight" property="weight"/>
+		<result column="status" property="status"/>
+		<result column="leg_length" property="legLength"/>
+		<result column="circumference" property="circumference"/>
+		<result column="rec_calory" property="recCalory"/>
+		<result column="image" property="image"/>
+		<result column="gender" property="gender"/>
+		<result column="main_cat" property="mainCat"/>
+		<result column="birthday" property="birthday"/>
+		<result column="createdAt" property="createdAt"/>
+		<result column="updatedAt" property="updatedAt"/>
+		
+		
+		<collection property="catCodeList" javaType="java.util.List" ofType="dto.CatCodeDTO">
+			
+			<result column="catCodeSeq" property="id"/>
+			<result column="kind" property="kind"/>
+			<result column="origin" property="origin"/>
+			<result column="character" property="character"/>
+			<result column="description" property="description"/>
+			<result column="c_size" property="cSize"/>
+			
+		</collection> 
+		
+	</resultMap>
+	
+	<select id="userInfo" parameterType="int" resultType="dto.CatUserDTO">
+		select * from cat_user
+		where id = #{userId}
+	</select>
+	
+	
+	<!-- 고양이 한개 불러옴 -->
+	<select id="lookone" parameterType="dto.CatDTO" resultType="dto.CatDTO">
+		select * from cat
+		where id=#{id}
+		and cat_user_id=#{catUserId}
+	</select>
+	
+	
+	<!-- 카드 삭제 -->
+	<delete id="cardDelete" parameterType="dto.CatDTO">
+		DELETE FROM cat
+		WHERE id=#{id} 
+		and cat_user_id=#{catUserId}
+	</delete>
+	
+	<!-- 카드 수정 -->
+	<update id="cardUpdate" parameterType="dto.CatDTO">
+		UPDATE cat
+		SET name=#{name}, age=#{age}, weight=#{weight},status=#{status},leg_length=#{legLength},circumference=#{circumference},rec_calory=#{recCalory},image=#{image},gender=#{gender},birthday=#{birthday}
+		WHERE id=#{id} 
+		and cat_user_id=#{catUserId}
+	</update>
+</mapper>

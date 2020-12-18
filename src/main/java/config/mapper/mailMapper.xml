@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+
+<mapper namespace="mail">
+
+	<!-- 이메일 보낼때의 secretkey의 임시 저장소 => 난수로 nickname받음 -->
+	<insert id="insertKey" parameterType="dto.CatUserDTO">
+		insert into cat_user 
+    	values(cat_user_id_seq.nextval,#{email},#{password},#{nickname},0,sysdate,sysdate, #{image ,jdbcType=VARCHAR},#{emailSecretKey})
+	</insert>
+	
+	
+	<!-- key값을 비교하기위해 저장해둔 key값을 찾아옴 -->
+	<select id="keyGet" parameterType="dto.CatUserDTO" resultType="String">
+		select secret_key
+    	from cat_user
+    	where email=#{email}
+	</select>
+	
+	
+	<!-- 인증실패시 저장해둔 이메일 정보를 삭제해줘야함 -->
+	<delete id="deleteMail" parameterType="dto.CatUserDTO">
+		delete cat_user
+		where email = #{email} 
+	</delete>
+	
+	
+	<!-- email_check_regist -->
+	<select id="email_check_regist" parameterType="dto.CatUserDTO" resultType="int">
+		select count(*)
+    	from cat_user
+    	where email=#{email} and password = '1'
+	</select>
+	
+	<!-- 비밀번호 인증하기 위해 발행한 키를 업데이트함 -->
+	<update id="updateKey" parameterType="dto.CatUserDTO">
+		update cat_user
+		set secret_key=#{emailSecretKey}
+		where email=#{email}
+	</update>
+	
+</mapper>

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+	<!-- @ResponseBody어노테이션이 동작하도록 설정 -->
+	<mvc:annotation-driven />
+	<task:annotation-driven />
+	<!-- <context:component-scan base-package="component"></context:component-scan> -->
+
+	<!-- [1] DataSource 빈 선언 -->
+	<context:property-placeholder location="classpath:config/oracle.properties" />
+
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+
+	<!-- [2] SqlSessionFactoryBean 빈 선언 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:config/configuration.xml"></property>
+	</bean>
+
+	<!-- [3] SqlSessionTemplate 빈 선언 -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory" />
+	</bean>
+
+	<!-- [4] DaoImp 빈 선언 -->
+	<bean id="communityDao" class="dao.CommunityDaoImp">
+		<property name="sqlSession" ref="sqlSession" />
+	</bean>
+	<bean id="authdao" class="dao.AuthDaoImp">
+		<property name="authSqlsession" ref="sqlSession" />
+	</bean>
+	<bean id="maildao" class="dao.MailSendDaoImp">
+		<property name="mailSqlsession" ref="sqlSession" />
+	</bean>
+	<bean id="shopDao" class="dao.ShopDaoImp">
+		<property name="sqlSession" ref="sqlSession" />
+	</bean>
+	<bean id="profileDao" class="dao.ProfileDaoImp">
+		<property name="profileSqlSession" ref="sqlSession" />
+	</bean>
+	<bean id="catCareDao" class="dao.CatCareDaoImp">
+		<property name="sqlSession" ref="sqlSession" />
+	</bean>
+	<bean id="mypagedao" class="dao.MyPageDaoImp">
+		<property name="myPageSqlsession" ref="sqlSession"/>
+	</bean>
+	<bean id="mainpagedao" class="dao.mainPageDaoImp">
+		<property name="sqlSession" ref="sqlSession"/>
+	</bean>
+	<bean id="postdao" class="dao.PostDaoImp">
+		<property name="sqlSession" ref="sqlSession"/>
+	</bean>
+
+	<!-- ServiceImp -->
+	<bean id="communityService" class="service.CommunityServiceImp">
+		<property name="dao" ref="communityDao" />
+	</bean>
+	<bean id="fileUploadService" class="service.FileUploadServiceImp">
+	</bean>
+	<bean id="authservice" class="service.AuthServiceImp">
+		<property name="authdao" ref="authdao" />
+	</bean>
+	<bean id="mailSendservice" class="service.MailSendServiceImp">
+		<property name="maildao" ref="maildao" />
+	</bean>
+	<bean id="shopService" class="service.ShopServiceImp">
+		<property name="shopdao" ref="shopDao" />
+	</bean>
+	<bean id="profileService" class="service.ProfileServiceImp">
+		<property name="profiledao" ref="profileDao" />
+	</bean>
+	<bean id="catCareService" class="service.CatCareServiceImp">
+		<property name="dao" ref="catCareDao" />
+	</bean>
+	<bean id="myPageservice" class="service.MyPageServiceImp">
+		<property name="mypagedao" ref="mypagedao"/>
+	</bean>
+	<bean id="mainPageservice" class="service.mainPageServiceImp">
+		<property name="dao" ref="mainpagedao"/>
+	</bean>
+	<bean id="postservice" class="service.PostServiceImp">
+		<property name="dao" ref="postdao"/>
+	</bean>
+
+	<!-- Gmail -->
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp.gmail.com" />
+		<property name="port" value="587" />
+		<property name="username" value="atome9797@gmail.com" />
+		<property name="password" value="fvncersqhxlpfsvt" />
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- tiles -->
+	<bean class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
+		<property name="definitions">
+			<list>
+				<value>/WEB-INF/tiles.xml</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- service가 붙은 Controller선언 -->
+	<bean id = "myPageController" class="controller.MyPageController" >
+		<property name="profileService" ref="profileService" />
+		<property name="catCareService" ref="catCareService" />
+		<property name="service" ref="myPageservice"/>
+	</bean>
+	
+	<bean id="communityController" class="controller.CommunityController">
+		<property name="service" ref="communityService" />
+		<property name="postservice" ref="postservice" />
+		<property name="fileUploadService" ref="fileUploadService" />
+	</bean>
+
+	<bean class="controller.AuthController">
+		<property name="authservice" ref="authservice" />
+	</bean>
+
+	<bean class="controller.MailSendController">
+		<property name="mailSendservice" ref="mailSendservice" />
+		<property name="mailSender" ref="mailSender" />
+	</bean>
+
+	<bean class="controller.ShopController">
+		<property name="service" ref="shopService" />
+		<property name="fileUploadService" ref="fileUploadService" />
+	</bean>
+	
+	<bean class="controller.mainPageController">
+		<property name="service" ref="mainPageservice" />
+	</bean>
+	
+	<!-- 멀티파트 리졸버 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- 최대업로드 가능한 바이트크기 -->
+		<property name="maxUploadSize" value="52428800" />
+		<!-- 디스크에 임시 파일을 생성하기 전에 메모리에 보관할수있는 최대 바이트 크기 -->
+		<!-- property name="maxInMemorySize" value="52428800" / -->
+		<!-- defaultEncoding -->
+		<property name="defaultEncoding" value="utf-8" />
+	</bean>
+	
+	<!-- intercepter 처리 -->
+    <mvc:interceptors>
+      <mvc:interceptor>
+         <mvc:mapping path="/community/postcat/writeForm.do"/>
+         <mvc:mapping path="/community/place/writeForm.do"/>
+         
+         <bean class="interceptor.LoginInterceptor"/>
+      </mvc:interceptor>
+    </mvc:interceptors>
+	
+	<!-- View -->
+	<!-- tiles를 이용한 view 페이지 처리 -->
+	<!-- view -->
+	<bean class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.tiles3.TilesView" />
+		<!-- 뷰를 처리하는 순서가 필요할 때 지정 -->
+		<property name="order" value="1" />
+	</bean>
+
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/view/" />
+		<property name="suffix" value=".jsp" />
+		<property name="order" value="2" />
+	</bean>
+</beans>

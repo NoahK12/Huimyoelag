@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+
+	<!-- main page start-->
+	<definition name="main" template="/WEB-INF/view/template/layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/view/template/mainHeader.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="/WEB-INF/view/template/footer.jsp" />
+	</definition>
+	
+	<!-- home -->
+	<definition name="mainHome" extends="main">
+		<put-attribute name="body" value="/WEB-INF/view/main/main.jsp" />
+	</definition>
+	
+	<!-- auth jsp -->
+	<definition name="authlogin" extends="main">
+		<put-attribute name="body" value="/WEB-INF/view/auth/login.jsp" />
+	</definition>
+	
+	<definition name="authregist" extends="main">
+		<put-attribute name="body" value="/WEB-INF/view/auth/regist.jsp" />
+	</definition>
+	<!-- main page end-->
+	
+	<definition name="shop" template="/WEB-INF/view/template/layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/view/template/shopHeader.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="/WEB-INF/view/template/footer.jsp" />
+	</definition>
+	
+	<definition name="store" extends="shop">
+		<put-attribute name="body" value="/WEB-INF/view/shop/shopHome.jsp" />
+	</definition>
+	
+	<definition name="storeWrite" extends="shop">
+		<put-attribute name="body" value="/WEB-INF/view/shop/shopWrite.jsp" />
+	</definition>
+	
+	<definition name="storeDetail" extends="shop">
+		<put-attribute name="body" value="/WEB-INF/view/shop/shopDetail.jsp" />
+	</definition>
+	
+	<!-- mypage start -->
+	<definition name="mypage" template="/WEB-INF/view/template/layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/view/template/myPageHeader.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="/WEB-INF/view/template/footer.jsp" />
+	</definition>
+	
+	<!-- home -->
+	<definition name="mypageHome" extends="mypage">
+		<put-attribute name="body" value="/WEB-INF/view/mypage/myPage.jsp" />
+	</definition>
+	
+	<!-- catCareMain -->
+	<definition name="catCareMain" extends="mypage">
+		<put-attribute name="body" value="/WEB-INF/view/mypage/CatCareMain.jsp" />
+	</definition>
+	
+	<!-- catAge -->
+	<definition name="catAge" extends="mypage">
+		<put-attribute name="body" value="/WEB-INF/view/mypage/CatAge.jsp" />
+	</definition>
+	
+	<definition name="catAgeResult" extends="mypage">
+		<put-attribute name="body" value="/WEB-INF/view/mypage/CatAgeResult.jsp" />
+	</definition>
+	
+	<!-- catFatness -->
+	<definition name="catFatness" extends="mypage">
+		<put-attribute name="body" value="/WEB-INF/view/mypage/CatFatness.jsp" />
+	</definition>
+	
+	<definition name="catFatnessResult" extends="mypage">
+		<put-attribute name="body" value="/WEB-INF/view/mypage/CatFatnessResult.jsp" />
+	</definition>
+	
+	<!-- recommendedCalorie -->
+	<definition name="recommendedCalorie" extends="mypage">
+		<put-attribute name="body" value="/WEB-INF/view/mypage/RecommendedCalorie.jsp" />
+	</definition>
+	
+	<definition name="recommendedCalorieResult" extends="mypage">
+		<put-attribute name="body" value="/WEB-INF/view/mypage/RecommendedCalorieReusult.jsp" />
+	</definition>
+	
+	<!-- profile -->
+	<definition name="profileView" extends="mypage">
+		<put-attribute name="body" value="/WEB-INF/view/mypage/profileView.jsp" />
+	</definition>
+	
+	<definition name="profileUpdate" extends="mypage">
+		<put-attribute name="body" value="/WEB-INF/view/mypage/profileUpdate.jsp" />
+	</definition>
+	<!-- mypage end -->
+	
+	<!-- community page start -->
+	<definition name="community" template="/WEB-INF/view/template/layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/view/template/communityHeader.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="/WEB-INF/view/template/footer.jsp" />
+	</definition>
+
+	<!-- home -->
+	<definition name="communityHome" extends="community">
+		<put-attribute name="body" value="/WEB-INF/view/community/communityHome.jsp" />
+	</definition>
+	
+	<definition name="postlist" extends="community">
+		<put-attribute name="body" value="/WEB-INF/view/community/post/list.jsp" />
+	</definition>
+	
+	<definition name="postupdate" extends="community">
+		<put-attribute name="body" value="/WEB-INF/view/community/post/update.jsp" />
+	</definition>
+	
+	<definition name="postview" extends="community">
+		<put-attribute name="body" value="/WEB-INF/view/community/post/view.jsp" />
+	</definition>
+	
+	<definition name="postwrite" extends="community">
+		<put-attribute name="body" value="/WEB-INF/view/community/post/write.jsp" />
+	</definition>
+	
+	<!-- postcat -->
+	<definition name="postcat" extends="community">
+		<put-attribute name="body" value="/WEB-INF/view/community/postCat/postCatView.jsp" />
+	</definition>
+	
+	<definition name="postcatwrite" extends="community">
+		<put-attribute name="body" value="/WEB-INF/view/community/postCat/postCatWrite.jsp" />
+	</definition>
+	
+	<!-- place jsp -->
+	<definition name="place" extends="community">
+		<put-attribute name="body" value="/WEB-INF/view/community/place/main.jsp" />
+	</definition>
+	
+	<definition name="placedetail" extends="community">
+		<put-attribute name="body" value="/WEB-INF/view/community/place/detail.jsp" />
+	</definition>
+	
+	<definition name="placewrite" extends="community">
+		<put-attribute name="body" value="/WEB-INF/view/community/place/write.jsp" />
+	</definition>
+	
+	<definition name="placeedit" extends="community">
+		<put-attribute name="body" value="/WEB-INF/view/community/place/edit.jsp" />
+	</definition>
+	
+	<!-- webView jsp -->
+	<definition name="webviewimage" extends="community">
+		<put-attribute name="body" value="/WEB-INF/view/community/webViewImage.jsp" />
+	</definition>
+	
+	<definition name="webviewvideo" extends="community">
+		<put-attribute name="body" value="/WEB-INF/view/community/webViewVideo.jsp" />
+	</definition>
+	<!-- community page end -->
+	
+	
+	
+
+</tiles-definitions>

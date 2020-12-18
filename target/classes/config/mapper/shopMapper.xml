@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="shop">
+
+	<resultMap type="dto.ProductCategoryDTO" id="categoryList">
+		<result column="id" property="id" />
+		<result column="cate_id" property="cateId" />
+		<result column="main_category" property="mainCategory" />
+		<result column="sub_category" property="subCategory" />
+		<collection property="productList" javaType="java.util.List" ofType="dto.ProductDTO">
+			<result column="id" property="id" />
+			<result column="cat_user_id" property="catUserId" />
+			<result column="product_cate_id" property="productCateId" />
+			<result column="title" property="title" />
+			<result column="price" property="price" />
+			<result column="stock" property="stock" />
+			<result column="saled_count" property="saledCount" />
+			<result column="read_count" property="readCount" />
+			<result column="description" property="description" />
+			<result column="rating" property="rating" />
+			<result column="brand" property="brand" />
+			<result column="createdat" property="createdAt" />
+			<result column="updatedat" property="updatedAt" />
+			<collection property="productMediaList" javaType="java.util.List" ofType="dto.ProductMediaDTO">
+				<result column="media_id" property="id" />
+				<result column="product_id" property="productId" />
+				<result column="url" property="url" />
+				<result column="type" property="type" />
+			</collection>
+		</collection>
+	</resultMap>
+
+	<!-- SHOP LIST START -->
+	<select id="shopList" resultMap="categoryList" parameterType="dto.GetParameterDTO">
+		SELECT
+		P.ID, P.CAT_USER_ID, P.PRODUCT_CATE_ID, P.TITLE, P.PRICE, P.STOCK, P.SALED_COUNT, P.READ_COUNT, P.DESCRIPTION, P.RATING, P.BRAND, P.CREATEDAT, P.UPDATEDAT,
+		PC.ID, PC.MAIN_CATEGORY, PC.SUB_CATEGORY,
+		PM.ID AS MEDIA_ID, PM.URL
+		FROM PRODUCT P, PRODUCT_CATEGORY PC, PRODUCT_MEDIA PM
+		WHERE P.PRODUCT_CATE_ID = PC.ID
+		AND P.ID = PM.PRODUCT_ID(+)
+		<!-- 메인카테고리 -->
+		<if test='category != null and !"".equals(category)'>
+			AND PC.MAIN_CATEGORY = (
+			SELECT RN.MAIN_CATEGORY FROM ( SELECT ROWNUM AS CATE_ID, MC.* FROM (
+			SELECT DISTINCT MAIN_CATEGORY FROM PRODUCT_CATEGORY ORDER BY MAIN_CATEGORY) MC) RN
+			WHERE RN.CATE_ID = #{category})
+			<if test='subCategoryName != null and !"".equals(subCategoryName)'> <!-- 서브카테고리 -->
+				AND PC.SUB_CATEGORY = #{subCategoryName}
+			</if>
+		</if>
+	</select>
+	<!-- SHOP LIST END -->
+
+	<!-- ITEM DETAIL VIEW START -->
+	<select id="itemDetail" parameterType="String" resultType="dto.ProductDTO">
+		SELECT * FROM PRODUCT WHERE ID = #{itemId}
+	</select>
+
+	<select id="detailImages" parameterType="String" resultType="dto.ProductMediaDTO">
+		SELECT URL FROM PRODUCT_MEDIA WHERE PRODUCT_ID = #{itemId}
+	</select>
+	<!-- ITEM DETAIL VIEW END -->
+
+	<!-- READCOUNT UPDATE START -->
+	<update id="readCountInc" parameterType="String">
+		UPDATE PRODUCT
+		SET READ_COUNT = READ_COUNT + 1
+		WHERE ID = #{itemId}
+	</update>
+	<!-- READCOUNT UPDATE END -->
+
+	<!-- SHOP MAINCATEGORY START -->
+	<select id="shopCategoryList" resultMap="categoryList">
+		SELECT CATE_ID, MAIN_CATEGORY FROM (
+		SELECT ROWNUM AS CATE_ID, MC.*
+		FROM ( SELECT DISTINCT MAIN_CATEGORY
+		FROM PRODUCT_CATEGORY ORDER BY MAIN_CATEGORY) MC)
+	</select>
+	<!-- SHOP MAINCATEGORY END -->
+
+	<!-- SHOP SUBCATEGORY START -->
+	<select id="shopCategoryList2" resultMap="categoryList" parameterType="String">
+		SELECT SUB_CATEGORY FROM PRODUCT_CATEGORY WHERE MAIN_CATEGORY =
+		( SELECT MAIN_CATEGORY FROM
+		( SELECT ROWNUM AS CATE_ID, MC.* FROM
+		( SELECT DISTINCT MAIN_CATEGORY FROM
+		PRODUCT_CATEGORY ORDER BY MAIN_CATEGORY) MC)
+		WHERE CATE_ID = #{category})
+		ORDER BY SUB_CATEGORY
+	</select>
+	<!-- SHOP SUBCATEGORY END -->
+
+	<!-- SHOP INSERT START -->
+	<select id="categoryId" parameterType="dto.ProductCategoryDTO" resultType="int">
+		SELECT ID FROM PRODUCT_CATEGORY
+		WHERE MAIN_CATEGORY = #{mainCategory}
+		AND SUB_CATEGORY = #{subCategory}
+	</select>
+
+	<insert id="productInsert" parameterType="dto.ProductDTO">
+		INSERT INTO PRODUCT
+		VALUES(product_id_seq.nextval, 1, #{productCateId}, #{title}, #{price}, 99, 0, 0, #{description}, 0, #{brand}, SYSDATE, SYSDATE)
+	</insert>
+
+	<insert id="mediaInsert" parameterType="dto.ProductMediaDTO">
+		INSERT INTO PRODUCT_MEDIA
+		VALUES(product_media_id_seq.nextval, #{productId}, #{url}, #{type})
+	</insert>
+	<!-- SHOP INSERT END -->
+
+	<select id="lastId" resultType="int">
+		SELECT ID
+		FROM (SELECT * FROM
+		PRODUCT ORDER BY ID DESC)
+		WHERE rownum = 1
+	</select>
+
+</mapper>

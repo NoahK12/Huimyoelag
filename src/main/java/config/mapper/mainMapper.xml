@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="main">
+	<select id="list" parameterType="dto.CatUserDTO" resultType="dto.CatUserDTO">
+		select * from(select row_number() over(order by createdAt desc)
+		cat_user_id_seq
+		,image
+		from cat_user
+		)
+		where cat_user_id_seq
+   <![CDATA[ < ]]>
+		5
+	</select>
+
+	<select id="aList" parameterType="dto.CatDTO" resultType="dto.CatDTO">
+		select * from(select row_number() over(order by createdAt desc)
+		cat_user_id_seq
+		,image
+		,name
+		from cat 
+		)
+		where cat_user_id_seq
+   <![CDATA[ < ]]>
+		7
+	</select>
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

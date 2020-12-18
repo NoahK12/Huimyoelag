@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="postCat">
+	
+	<insert id="postCatReplyWrite" parameterType="hashmap">
+		INSERT INTO post_cat_reply VALUES(post_cat_reply_id_seq.NEXTVAL, #{userId}, #{postCatId}, #{content}, 0, sysdate, sysdate)
+	</insert>
+	
+	<select id="getReplyId" parameterType="hashmap" resultType="int">
+		SELECT MAX(id) FROM post_cat_reply where cat_user_id=#{userId} AND post_cat_id=#{postCatId}
+	</select>
+	
+	<select id="postCatDel" parameterType="int">
+		DELETE post_cat WHERE id=#{postCatId}
+	</select>
+	
+	<select id="postCatReplyDel" parameterType="int">
+		DELETE post_cat_reply WHERE id=#{replyId}
+	</select>
+	
+	<select id="postCatModify" parameterType="hashmap">
+		UPDATE post_cat SET content=#{modifiedContent}, updatedat=sysdate WHERE id=#{postCatId}
+	</select>
+	
+	<select id="postCatReplyModify" parameterType="hashmap">
+		UPDATE post_cat_reply SET content=#{modifiedReplyContent}, updatedat=sysdate WHERE id=#{replyId}
+	</select>
+	
+	<select id="incViewCount" parameterType="int">
+		UPDATE post_cat SET view_count=view_count+1 WHERE id=#{postCatId}
+	</select>
+	
+	<select id="cancleLike" parameterType="hashmap">
+		DELETE post_cat_like WHERE post_cat_id=#{postCatId} and cat_user_id=#{userId} 
+	</select>
+	
+	<select id="incLike" parameterType="hashmap">
+		INSERT INTO post_cat_like VALUES(post_cat_like_id_seq.NEXTVAL, #{userId}, #{postCatId}, sysdate) 
+	</select>
+	
+	<select id="catList" parameterType="int" resultType="dto.CatDTO">
+		SELECT * FROM cat WHERE cat_user_id = #{userId}
+	</select>
+	
+	<insert id="insert" parameterType="dto.PostCatDTO">
+		INSERT INTO post_cat
+		VALUES (post_cat_id_seq.NEXTVAL, #{catUserId}, #{content}, 0,  SYSDATE, SYSDATE, #{catSelect})
+	</insert>
+	
+	<insert id="mediaInsert" parameterType="dto.PostCatMediaDTO">
+		INSERT INTO post_cat_media
+		VALUES (post_cat_media_id_seq.NEXTVAL, #{postCatId}, #{url}, #{type})
+	</insert>
+	
+	<select id="last_id" resultType="int">
+		SELECT id
+		FROM (SELECT * FROM post_cat ORDER BY id DESC)
+		WHERE rownum = 1
+	</select>
+	
+	<resultMap type="dto.PostCatDTO" id="post_cat_list" autoMapping="false">
+		<result column="pc_id" property="id"/>
+		<result column="pc_view_count" property="viewCount"/>
+		<result column="pc_updatedat" property="updatedAt"/>
+		
+		<association property="catUser" javaType="dto.CatUserDTO" >
+			<result column="u_nickname" property="nickname"/>
+			<result column="u_image" property="image"/>
+		</association>
+		
+		<association property="likeCounting" javaType="dto.PostCatLikeDTO" >
+			<result column="pcl_like_count" property="likeCount"/>
+		</association>
+		
+		<association property="replyCounting" javaType="dto.PostCatReplyDTO" >
+			<result column="pcr_reply_count" property="replyCount"/>
+		</association>
+		
+		<collection property="mediaList" autoMapping="false" javaType="java.util.List" ofType="dto.PostCatMediaDTO">
+			<result column="url" property="url"/>
+		</collection>
+		
+	</resultMap>
+
+	<select id="list" resultMap="post_cat_list">
+		SELECT u.nickname as u_nickname, u.image as u_image,
+		       pc.id as pc_id, pc.view_count as pc_view_count, pc.updatedat as pc_updatedat, 
+		       pcm.url,
+		       pcl.pcl_like_count, 
+		       pcr.pcr_reply_count
+		FROM cat_user u, post_cat pc, post_cat_media pcm,
+		     (SELECT count(*) as pcl_like_count, post_cat_id FROM post_cat_like group by post_cat_id) pcl,
+		     (SELECT count(*) as pcr_reply_count, post_cat_id as pcr_post_cat_id FROM post_cat pc, post_cat_reply pcr WHERE pc.id = pcr.post_cat_id group by post_cat_id) pcr
+		WHERE u.id = pc.cat_user_id 
+		      and pc.id=pcm.post_cat_id 
+		      and pc.id = pcl.post_cat_id(+) 
+		      and pc.id = pcr.pcr_post_cat_id(+)
+		ORDER BY pc_updatedat DESC
+	</select>
+	
+	<!-- modal mapping -->
+	<resultMap type="dto.PostCatDTO" id="post_cat_modal" autoMapping="false">
+		<result column="pc_id" property="id"/>
+		<result column="pc_view_count" property="viewCount"/>
+		<result column="pc_updatedat" property="updatedAt"/>
+		<result column="pc_createdat" property="createdAt"/>
+		<result column="pc_content" property="content"/>
+		
+		<!-- 1:1 relations -->
+		<association property="catUser" javaType="dto.CatUserDTO" >
+			<result column="u_id" property="id"/>
+			<result column="u_nickname" property="nickname"/>
+			<result column="u_image" property="image"/>
+		</association>
+		
+		<association property="likeCounting" javaType="dto.PostCatLikeDTO" >
+			<result column="pcl_like_count" property="likeCount"/>
+		</association>
+		
+		<association property="catKind" javaType="dto.CatCodeDTO" >
+			<result column="cc_kind" property="kind"/>
+		</association>
+		
+		<association property="cat" javaType="dto.CatDTO" >
+			<result column="c_name" property="name"/>
+			<result column="c_age" property="age"/>
+		</association>
+		
+		<!-- 1:multi relations -->
+		<collection property="mediaList" autoMapping="false" javaType="java.util.List" ofType="dto.PostCatMediaDTO">
+			<result column="pcm_url" property="url"/>
+		</collection>
+
+		<collection property="replyList" autoMapping="false" javaType="java.util.List" ofType="dto.PostCatReplyDTO">
+			<result column="pcr_id" property="id"/>
+			<result column="pcr_cat_user_id" property="catUserId"/>
+			<result column="pcr_content" property="content"/>
+			<result column="pcr_like_count" property="likeCount"/>
+			<result column="pcr_createdat" property="createdAt"/>
+			<result column="pcr_name" property="replyName"/>
+			<result column="pcr_image" property="replyImage"/>
+		</collection>
+		
+	</resultMap>
+	
+	<select id="modal" parameterType="int" resultMap="post_cat_modal">
+	    SELECT u.id as u_id, u.nickname as u_nickname, u.image as u_image, 
+           c.name as c_name, c.age as c_age,
+           cc.kind as cc_kind,
+           pc.id as pc_id, pc.view_count as pc_view_count, pc.updatedat as pc_updatedat, pc.createdat as pc_createdat, pc.content as pc_content, 
+           pcm.url as pcm_url,
+           pcr.pcr_id, pcr.pcr_content, pcr.pcr_like_count, pcr.pcr_createdat, pcr.pcr_name, pcr.pcr_image,
+           pcl.pcl_like_count
+	    FROM cat_user u, post_cat pc, post_cat_media pcm, cat c, cat_code cc,
+	         (SELECT count(*) as pcl_like_count, post_cat_id FROM post_cat_like group by post_cat_id) pcl,
+	         (SELECT u.nickname as pcr_name, u.image as pcr_image, pcr.post_cat_id as pcr_post_cat_id, pcr.content as pcr_content, pcr.like_count as pcr_like_count, pcr.createdat as pcr_createdat, pcr.id as pcr_id FROM cat_user u, post_cat_reply pcr WHERE u.id = pcr.cat_user_id) pcr
+	    WHERE u.id = pc.cat_user_id 
+	            and pc.id = pcm.post_cat_id 
+	            and pc.cat_id = c.id 
+	            and pc.id = pcr.pcr_post_cat_id(+) 
+	            and pc.id = pcl.post_cat_id(+) 
+	            and cc.id = c.cat_code_id(+)
+	          AND pc.id=#{postCatId}
+	    ORDER BY pcr_createdat
+	</select>
+	
+	<resultMap type="dto.PostCatLikeDTO" id="post_cat_like_list">
+		<result column="id" property="id" />
+		<result column="post_cat_id" property="postCatId" />
+		<result column="cat_user_id" property="catUserId" />
+		<association property="catUser" javaType="dto.CatUserDTO">
+			<result column="email" property="email" />
+			<result column="nickname" property="nickname" />
+			<result column="admin" property="admin" />
+			<result column="image" property="image" />
+		</association>
+	</resultMap>
+	
+	<select id="likeList" parameterType="int" resultMap="post_cat_like_list">
+		select pcl.id, pcl.post_cat_id, pcl.cat_user_id, pcl.createdAt,
+		       u.email, u.nickname, u.admin, u.image
+		from post_cat_like pcl, cat_user u
+		where pcl.cat_user_id = u.id
+      		  and post_cat_id = #{postCatId}
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

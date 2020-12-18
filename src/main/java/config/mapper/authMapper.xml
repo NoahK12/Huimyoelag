@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+    
+<mapper namespace="auth">
+	
+	<!-- 인증키와 이메일이 있으면 1-->
+	<select id="registIdentify" parameterType="dto.CatUserDTO" resultType="int">
+		select count(*)
+    	from cat_user
+    	where email=#{email} and secret_key=#{emailSecretKey}
+	</select>
+	
+	
+	<!-- 회원가입 -->
+	<update id="regist" parameterType="dto.CatUserDTO">
+		update cat_user 
+    	set secret_key=#{emailSecretKey}, nickname=#{nickname}, password=#{password}
+    	where email=#{email}
+	</update>
+	
+	
+	<!-- 로그인 기능 -->
+	<select id="loginIdentify" parameterType="dto.CatUserDTO" resultType="int">
+		select count(*)
+    	from cat_user
+    	where email=#{email} and password=#{password}
+	</select>
+	
+	
+	<!-- nickname_check기능 -->
+	<select id="nickname_check" parameterType="dto.CatUserDTO" resultType="int">
+		select count(*)
+    	from cat_user
+    	where nickname=#{nickname}
+	</select>
+	
+	
+	<!-- email_check기능 -->
+	<select id="email_check" parameterType="dto.CatUserDTO" resultType="int">
+		select count(*)
+    	from cat_user
+    	where email=#{email}
+	</select>
+	
+	
+	<!-- 이메일에 대한 아이디값 가져오기 -->
+	<select id="get_session" parameterType="dto.CatUserDTO" resultType="dto.CatUserDTO">
+		select *
+		from cat_user
+		where email=#{email}
+	</select>
+	
+	
+</mapper>

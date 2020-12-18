@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="post">
+	
+	<resultMap type="dto.PostDTO" id="post_count" autoMapping="false" >
+		<result column="id" property="id" />
+		<result column="cat_user_id" property="cat_user_id" />
+		<result column="title" property="title" />
+		<result column="content" property="content" />
+		<result column="category" property="category" />
+		<result column="view_count" property="view_count" />
+		<result column="createdat" property="createdAt" />
+		<result column="updatedat" property="updatedAt" />
+
+		<association property="userDetail" javaType="dto.CatUserDTO">
+			<result column="id" property="id"/>
+			<result column="nickname" property="nickname" />
+		</association>
+	</resultMap>
+	
+	<select id="count" resultType="int" parameterType="dto.PageDTO">
+		select
+		count (*) 
+ 		from post p, cat_user u
+		<where>
+			<choose>
+				<when test="searchKey == 'all'">
+					p.title like '%' || #{searchWord} || '%' OR
+					p.content like '%' || #{searchWord} || '%' OR
+					u.nickname like '%' || #{searchWord} || '%'
+				</when>
+				<when test="searchKey=='title'">
+					p.title like '%' || #{searchWord} || '%'
+				</when>
+				<when test="searchKey=='content'">
+					p.content like '%' || #{searchWord} || '%'
+				</when>
+				<when test="searchKey=='writer'">
+					u.nickname like '%' || #{searchWord} || '%'
+				</when>
+			</choose>
+			AND p.cat_user_id = u.id
+		
+		</where>
+		
+		
+		
+		
+	</select>
+
+	<resultMap type="dto.PostDTO" id="post_list" autoMapping="false">
+		<result column="id" property="id" />
+		<result column="cat_user_id" property="cat_user_id" />
+		<result column="title" property="title" />
+		<result column="content" property="content" />
+		<result column="category" property="category" />
+		<result column="view_count" property="view_count" />
+		<result column="createdat" property="createdAt" />
+		<result column="updatedat" property="updatedAt" />
+
+		<association property="userDetail" javaType="dto.CatUserDTO">
+			<!-- <result column="id" property="id"/> -->
+			<result column="nickname" property="nickname" />
+		</association>
+	</resultMap>
+	
+	<select id="testList" parameterType="dto.PageDTO" resultMap="post_list">
+		<![CDATA[
+		select b.* 
+		from (select rownum as rm, a.* 
+				from(
+					select p.*, u.nickname 
+					from post p, cat_user u
+					]]>
+		<where>
+			<choose>
+				<when test="searchKey == 'all'">
+					p.title like '%' || #{searchWord} || '%' OR
+					p.content like '%' || #{searchWord} || '%' OR
+					u.nickname like '%' || #{searchWord} || '%'
+				</when>
+				<when test="searchKey=='title'">
+					p.title like '%' || #{searchWord} || '%'
+				</when>
+				<when test="searchKey=='content'">
+					p.content like '%' || #{searchWord} || '%'
+				</when>
+				<when test="searchKey=='writer'">
+					u.nickname like '%' || #{searchWord} || '%'
+				</when>
+			</choose>
+					AND p.cat_user_id = u.id
+					
+		</where>
+					
+		<![CDATA[
+		order by p.id desc)a)b
+		where b.rm>=#{startRow} and b.rm<=#{endRow}
+		]]>
+	</select>
+	
+	<resultMap type="dto.PostDTO" id="post_view" autoMapping="false">
+		<result column="id" property="id" />
+		<result column="cat_user_id" property="cat_user_id" />
+		<result column="title" property="title" />
+		<result column="content" property="content" />
+		<result column="category" property="category" />
+		<result column="view_count" property="view_count" />
+		<result column="createdat" property="createdAt" />
+		<result column="updatedat" property="updatedAt" />
+
+		<association property="userDetail" javaType="dto.CatUserDTO">
+			<result column="nickname" property="nickname" />
+		</association>
+		
+		<collection property="postMediaList" javaType="java.util.List" autoMapping="false" ofType="dto.PostMediaDTO">
+			<result column="post_id" property="post_id"/>
+			<result column="url" property="url"/>
+		</collection>
+	</resultMap>
+	
+	<select id="view" parameterType="int" resultMap="post_view">
+		select p.*, u.nickname , pm.url
+		from post p, cat_user u, post_media pm
+		where p.cat_user_id = u.id 
+		AND p.id = pm.post_id
+		AND p.id = #{id}
+	</select>
+
+	<insert id="post_insert" parameterType="dto.PostDTO">
+		INSERT INTO post
+		VALUES
+		(post_id_seq.NEXTVAL, #{cat_user_id}, #{title},
+		 #{content}, #{category}, 0, SYSDATE, SYSDATE)
+	</insert>
+	
+	
+	<select id="content" parameterType="int" resultType="dto.PostDTO">
+		select *
+		from post where id = #{id}
+	</select>
+	
+	<select id="post_Modify" parameterType="dto.PostDTO">
+		UPDATE post SET
+		title= #{title}, content = #{content}, updatedat = sysdate WHERE id=#{id}
+	</select>
+
+	<select id="post_Del" parameterType="int">
+		DELETE post WHERE
+		id=#{id}
+	</select>
+	
+	<insert id="post_ReplyWrite" parameterType="dto.PostReplyDTO">
+		INSERT INTO
+		post_reply VALUES(post_reply_id_seq.NEXTVAL, #{post_id}, #{cat_user_id},
+		#{content}, 0, sysdate, sysdate)
+	</insert>
+	
+	<select id="post_getReplyId" parameterType="hashmap" resultType="int">
+		SELECT MAX(id) FROM post_reply where cat_user_id=#{cat_user_id} AND
+		post_id=#{post_id}
+	</select>
+	
+	<select id="post_list" parameterType="int" resultType="dto.PostReplyDTO">
+		select*from
+		post_reply where post_id=#{post_id} order by id desc
+	</select>
+
+	<select id="post_ReplyDel" parameterType="int">
+		DELETE post_reply WHERE
+		id=#{id}
+	</select>
+
+
+	<select id="post_ReplyModify" parameterType="dto.PostReplyDTO">
+		UPDATE post_reply
+		SET content='${content}', updatedat=sysdate WHERE
+		id=#{id}
+	</select>
+
+
+
+	<select id="post_ViewCount" parameterType="int">
+		UPDATE post SET
+		view_count=view_count+1 WHERE id=#{postId}
+	</select>
+
+	<select id="post_cancleLike" parameterType="hashmap">
+		DELETE post_like
+		WHERE post_id=#{postId} and cat_user_id=#{userId}
+	</select>
+
+	<select id="post_incLike" parameterType="hashmap">
+		INSERT INTO post_like
+		VALUES(post_like_id_seq.NEXTVAL, #{userId}, #{postId}, sysdate)
+	</select>
+
+	<select id="post_List" parameterType="int" resultType="dto.PostDTO">
+		SELECT *
+		FROM post WHERE cat_user_id = #{userId}
+	</select>
+
+
+	<insert id="media_insert" parameterType="dto.PostMediaDTO">
+		INSERT INTO
+		post_media
+		VALUES (post_media_id_seq.NEXTVAL, #{post_Id},
+		 #{url}, #{type})
+	</insert>
+
+	<select id="post_last_id" resultType="int">
+		SELECT id
+		FROM (SELECT *
+		FROM post ORDER BY id DESC)
+		WHERE rownum = 1
+	</select>
+
+
+<!-- 		<association property="likeCounting" javaType="dto.PostLikeDTO">
+			<result column="like_count" property="likeCount" />
+		</association> -->
+
+		<!-- <association property="replyCounting" javaType="dto.PostReplyDTO">
+			<result column="reply_count" property="replyCount" />
+		</association> -->
+
+		<!-- <collection property="mediaList" autoMapping="false"
+			javaType="java.util.List" ofType="dto.PostMediaDTO">
+			<result column="url" property="url" />
+		</collection> -->
+	
+	
+	<!-- <select id="list" resultMap="post_list">
+		SELECT u.nickname as u_nickname, u.image as u_image, p.id as p_id,p.title
+		as p_title, p.category as p_category, p.view_count as p_view_count,
+		p.updatedat
+		as p_updatedat, pm.url, pl.pl_like_count, pr.pr_reply_count FROM
+		cat_user
+		u, post p, post_media pm, (SELECT count(*) as pl_like_count, post_id
+		FROM
+		post_like group by post_id) pl, (SELECT count(*) as pr_reply_count, post_id
+		as pr_post_id FROM post pc, post_reply pr WHERE pc.id = pr.post_id group
+		by post_id) pr WHERE u.id = pc.cat_user_id and pc.id=pm.post_cat_id
+		and pc.id
+		= pl.post_id(+) and pc.id = pr.pr_post_id(+) ORDER BY pc_updatedat DESC
+
+		SELECT u.nickname as u_nickname, u.image as u_image,
+		pc.id as pc_id, pc.view_count as pc_view_count, pc.updatedat as
+		pc_updatedat,
+		pm.url,
+		pl.pl_like_count,
+		pr.pr_reply_count
+		FROM cat_user u, post p, post_media pm,
+		(SELECT count(*) as pl_like_count, post_id FROM post_like group by post_id)
+		pl,
+		(SELECT count(*) as pr_reply_count, post_id as pr_post_id FROM post p,
+		post_reply pr WHERE pc.id = pr.post_id group by post_id) pr
+		WHERE u.id
+		= pc.cat_user_id
+		and p.id=pcm.post_id
+		and p.id = pl.post_id(+)
+		and p.id = pr.pr_post_id(+)
+		ORDER BY pc_updatedat DESC
+	</select>  -->
+
+	
+	<!-- <select id="view" parameterType="int" resultMap="post_view">
+		SELECT u.id as u_id, u.nickname as u_nickname, u.image as u_image,
+		c.name as c_name, c.age as c_age,
+		cc.kind as cc_kind,
+		pv.id as pv_id,pv.title as pv_title,pv.category as
+		pv_category,pv.view_count as pv_view_count, pv.updatedat as
+		pv_updatedat, pv.createdat as pv_createdat, pv.content as pv_content,
+		pm.url as pm_url,
+		pr.pr_id, pr.pr_content, pr.pr_like_count, pr.pr_createdat, pr.pr_name,
+		pr.pr_image,
+		pl.pl_like_count
+		FROM cat_user u, post pv, post_media pm, cat c, cat_code cc,
+		(SELECT count(*) as pl_like_count, post_id FROM post_like group by post_id)
+		pl,
+		(SELECT u.nickname as pr_name, u.image as pr_image, pr.post_id as pr_post_id,
+		pr.content as pr_content, pr.like_count as pr_like_count, pr.createdat
+		as pr_createdat, pr.id as pr_id FROM cat_user u, post_reply pr WHERE
+		u.id = pr.cat_user_id) pr
+		WHERE u.id = pc.cat_user_id
+		and p.id = pm.post_id
+		and p.cat_id = c.id
+		and p.id = pr.pcr_post_id(+)
+		and p.id = pl.post_id(+)
+		and cc.id = c.cat_code_id(+)
+		AND pc.id=#{postId}
+		ORDER BY pr_createdat
+	</select> -->
+	
+
+	<resultMap type="dto.PostLikeDTO" id="post_like_list">
+		<result column="id" property="id" />
+		<result column="post_id" property="postId" />
+		<result column="cat_user_id" property="catUserId" />
+		<association property="catUser" javaType="dto.CatUserDTO">
+			<result column="email" property="email" />
+			<result column="nickname" property="nickname" />
+			<result column="admin" property="admin" />
+			<result column="image" property="image" />
+		</association>
+	</resultMap>
+
+	<select id="post_likeList" parameterType="int" resultMap="post_like_list">
+		select
+		pl.id, pl.post_id, pl.cat_user_id, pl.createdAt,
+		u.email, u.nickname, u.admin, u.image
+		from post_like pl, cat_user u
+		where
+		pl.cat_user_id = u.id
+		and post_id = #{postId}
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

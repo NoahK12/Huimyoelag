@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="place">
+
+	<resultMap type="dto.PlaceDTO" id="place_detail">
+		<result column="id" property="id" />
+		<result column="cat_user_id" property="catUserId" />
+		<result column="title" property="title" />
+		<result column="latitude" property="latitude" />
+		<result column="longitude" property="longitude" />
+		<result column="content" property="content" />
+		<result column="rating" property="rating" />
+		<result column="category" property="category" />
+		<result column="address" property="address" />
+		<result column="phone_number" property="phoneNumber" />
+		<result column="createdAt" property="createdAt" />
+		<result column="updatedAt" property="updatedAt" />
+		<collection property="placeMediaList" javaType="java.util.List"
+			ofType="dto.PlaceMediaDTO">
+			<result column="media_id" property="placeId" />
+			<result column="url" property="url" />
+			<result column="type" property="type" />
+		</collection>
+	</resultMap>
+
+	<resultMap type="dto.PlaceReviewDTO" id="place_review_list">
+		<result column="id" property="id" />
+		<result column="place_id" property="placeId" />
+		<result column="cat_user_id" property="catUserId" />
+		<result column="content" property="content" />
+		<result column="rating" property="rating" />
+		<result column="like_count" property="likeCount" />
+		<result column="createdAt" property="createdAt" />
+		<result column="updatedAt" property="updatedAt" />
+		<association property="catUser" javaType="dto.CatUserDTO">
+			<result column="email" property="email" />
+			<result column="nickname" property="nickname" />
+			<result column="admin" property="admin" />
+			<result column="image" property="image" />
+		</association>
+	</resultMap>
+
+	<resultMap type="dto.PlaceLikeDTO" id="place_like_list">
+		<result column="id" property="id" />
+		<result column="place_id" property="placeId" />
+		<result column="cat_user_id" property="catUserId" />
+		<association property="catUser" javaType="dto.CatUserDTO">
+			<result column="email" property="email" />
+			<result column="nickname" property="nickname" />
+			<result column="admin" property="admin" />
+			<result column="image" property="image" />
+		</association>
+	</resultMap>
+
+	<resultMap type="dto.PlaceLikeDTO" id="place_like">
+		<association property="user" javaType="dto.CatUserDTO"></association>
+	</resultMap>
+
+	<select id="list" resultMap="place_detail">
+		select p.id, p.cat_user_id, p.title,
+		p.latitude, p.longitude, p.content, p.rating, p.category, p.address,
+		p.phone_number, p.createdAt, p.updatedAt,
+		pm.id as media_id, pm.url,
+		pm.type
+		from place p, place_media pm
+		where p.id = pm.place_id(+)	
+	</select>
+
+	<select id="one" parameterType="int" resultMap="place_detail">
+		select p.id,
+		p.cat_user_id, p.title, p.latitude, p.longitude, p.content, p.rating,
+		p.category, p.address, p.phone_number, p.createdAt, p.updatedAt,
+		pm.id
+		as media_id, pm.url, pm.type
+		from place p, place_media pm
+		where p.id =
+		pm.place_id(+)
+		and p.id = #{placeId}
+	</select>
+
+	<select id="review_list" parameterType="int" resultMap="place_review_list">
+		SELECT
+		pr.id, pr.place_id, pr.cat_user_id, pr.content, pr.rating,
+		pr.like_count, pr.createdAt, pr.updatedAt,
+		cu.email, cu.nickname,
+		cu.admin, cu.image
+		FROM PLACE_REVIEW pr, CAT_USER cu
+		WHERE
+		pr.cat_user_Id = cu.id
+		AND place_id = #{placeId}
+	</select>
+
+	<select id="like_list" parameterType="int" resultMap="place_like_list">
+		select
+		pl.id, pl.place_id, pl.cat_user_id, pl.createdAt,
+		cu.email,
+		cu.nickname, cu.admin, cu.image
+		from place_like pl, cat_user cu
+		where
+		pl.cat_user_id = cu.id
+		and place_id = #{placeId}
+	</select>
+
+	<select id="category_list" resultType="String">
+		SELECT distinct category
+		FROM PLACE
+	</select>
+
+	<insert id="insert" parameterType="dto.PlaceDTO">
+		INSERT INTO place
+		VALUES
+		(PLACE_ID_SEQ.NEXTVAL, #{catUserId}, #{title}, #{latitude},
+		#{longitude}, #{content}, #{rating}, #{category}, #{address},
+		#{phoneNumber}, SYSDATE, SYSDATE)
+	</insert>
+
+	<insert id="media_insert" parameterType="dto.PlaceMediaDTO">
+		INSERT INTO place_media
+		VALUES (PLACE_MEDIA_ID_SEQ.NEXTVAL, #{placeId}, #{url}, #{type})
+	</insert>
+
+	<select id="last_id" resultType="int">
+		SELECT id
+		FROM (SELECT * FROM
+		place ORDER BY id DESC)
+		WHERE rownum = 1
+	</select>
+	
+	<delete id="delete" parameterType="int">
+		DELETE FROM place
+		WHERE id = #{placeId}
+	</delete>
+	
+	<select id="get_url" parameterType="int" resultType="String">
+		SELECT url FROM place_media WHERE place_id = #{placeId}
+	</select>
+
+	<insert id="like" parameterType="java.util.HashMap">
+		INSERT INTO place_like
+		VALUES
+		(PLACE_LIKE_ID_SEQ.NEXTVAL, #{placeId}, #{userId}, SYSDATE)
+	</insert>
+
+	<delete id="unlike" parameterType="java.util.HashMap">
+		DELETE FROM place_like
+		WHERE
+		place_id = #{placeId} AND cat_user_id = #{userId}
+	</delete>
+
+	<insert id="review_insert" parameterType="dto.PlaceReviewDTO">
+		INSERT INTO
+		place_review
+		VALUES (PLACE_REVIEW_ID_SEQ.NEXTVAL, #{placeId},
+		#{catUserId}, #{content}, #{rating}, 0, SYSDATE, SYSDATE)
+	</insert>
+
+	<delete id="review_delete" parameterType="int">
+		DELETE FROM
+		place_review
+		WHERE id = #{reviewId}
+	</delete>
+
+	<update id="update" parameterType="dto.PlaceDTO">
+		UPDATE place SET
+		title =
+		#{title}, content = #{content}, latitude = #{latitude}, longitude =
+		#{longitude}, category = #{category}, address = #{address},
+		phone_number=#{phoneNumber}
+		WHERE id = #{id}
+	</update>
+
+	<update id="rating_update" parameterType="int">
+		UPDATE place
+		SET rating = (SELECT AVG(rating) FROM place_review WHERE place_id = #{placeId})
+		WHERE id = #{placeId}
+	</update>
+	
+	<update id="review_like" parameterType="int">
+		UPDATE place_review
+		SET like_count = like_count + 1
+		WHERE id = #{reviewId}
+	</update>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

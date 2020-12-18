@@ -1,0 +1,24 @@
+
+
+.find_join{
+	display: inline;
+	list-style: none;
+	margin: 29%;
+}
+
+.find_join_id{
+	margin: 1%;
+	color: gray;
+}
+
+#cancel{
+	margin-top: 2%;
+}
+
+
+#content-body-login{
+		height: auto;
+		width: 600px;
+		margin: auto;
+		margin-top: 5%
+	}
